@@ -1,0 +1,178 @@
+{
+  "schemaVersion": "1.0.0",
+  "projectStateVersion": 3,
+  "summary": "Build an Android finance-tracking app for Guinea’s informal sector called “Gère Mon Argent” using FlutterFlow + Firebase, with a highly visual low-literacy UX, offline-first data entry with sync, sales/expense tracking, automatic calculations (available cash, daily profit, monthly progress), and monthly goals with performance visualization.",
+  "architectural_notes": [
+    "Tech stack target: FlutterFlow app with Firebase backend (Firestore) and Android APK export.",
+    "Primary locale French; optional secondary local language; UX optimized for low-literacy with icon-first UI and large tap targets.",
+    "Currency: GNF (Guinean Franc).",
+    "Backend data model: Users(id, prenom, type_activite, langue), Ventes(id, user_id, date, montant, produit), Depenses(id, user_id, date, montant, categorie), Objectifs(id, user_id, mois, objectif_mensuel).",
+    "Core formulas: available cash = Σ ventes − Σ depenses; daily profit = ventes_du_jour − depenses_du_jour; goal progress = (argent_cumule / objectif_mensuel) × 100.",
+    "Offline-first requirement with later synchronization."
+  ],
+  "known_issues": [],
+  "isFixRequest": false,
+  "imageRequirements": "## Required Images\n- Warm modern African market/boutique illustration, friendly and educational, vector style (welcome-hero.dim_1400x900.png)\n- Large simple icon for activity type: Shop/storefront, flat style (icon-activity-shop.dim_256x256.png)\n- Large simple icon for activity type: Food, flat style (icon-activity-food.dim_256x256.png)\n- Large simple icon for activity type: Clothing, flat style (icon-activity-clothing.dim_256x256.png)\n- Large simple icon for activity type: Transport, flat style (icon-activity-transport.dim_256x256.png)\n- Large simple icon for expense category: Merchandise/stock, flat style (icon-expense-merchandise.dim_256x256.png)\n- Large simple icon for expense category: Transport, flat style (icon-expense-transport.dim_256x256.png)\n- Large simple icon for expense category: Food, flat style (icon-expense-food.dim_256x256.png)\n- Large simple icon for expense category: Other/misc, flat style (icon-expense-other.dim_256x256.png)",
+  "existing_features": [
+    {
+      "id": "feature-create-a-mobile-first-frontend-with-the-7-requested-screens-and-navigation-flow-welcome-language-selection-start-profile-setup-first-name-activity-type-via-large-icons-dashboard-greeting-today-available-cash-in-gnf-two-primary-actions-add-sale-amount-optional-product-add-expense-amount-category-via-large-icons-daily-summary-today-s-sales-list-expenses-list-auto-daily-profit-motivational-message-monthly-goal-set-goal-progress-bar-remaining-amount-link-to-view-goals-history-if-implemented",
+      "title": "Create a mobile-first frontend with the 7 requested screens and navigation flow: Welcome (language selection + start), Profile Setup (first name + activity type via large icons), Dashboard (greeting + today available cash in GNF + two primary actions), Add Sale (amount + optional product), Add Expense (amount + category via large icons), Daily Summary (today’s sales list, expenses list, auto daily profit, motivational message), Monthly Goal (set goal, progress bar, remaining amount, link to view goals/history if implemented).",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-offline-first-data-entry-on-the-frontend-allow-creating-sales-expenses-goals-while-offline-by-queuing-writes-locally-and-automatically-sync-queued-actions-to-the-backend-when-connectivity-is-restored-without-data-loss-or-duplicate-entries",
+      "title": "Implement offline-first data entry on the frontend: allow creating sales/expenses/goals while offline by queuing writes locally, and automatically sync queued actions to the backend when connectivity is restored, without data loss or duplicate entries.",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-wire-the-frontend-to-the-backend-using-the-project-s-standard-actor-auth-approach-internet-identity-ensuring-each-user-s-data-is-isolated-and-that-profile-creation-is-required-before-showing-the-main-dashboard-actions",
+      "title": "Wire the frontend to the backend using the project’s standard actor/auth approach (Internet Identity), ensuring each user’s data is isolated and that profile creation is required before showing the main dashboard actions.",
+      "reqIds": [
+        "REQ-4"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-the-automatic-calculations-in-the-ui-and-or-backend-consistent-and-testable-available-cash-sum-sales-sum-expenses-daily-profit-today-sales-today-expenses-monthly-goal-progress-month-net-or-month-sales-use-the-definition-shown-in-ui-goal-100-with-safe-handling-when-goal-is-0-or-missing",
+      "title": "Implement the automatic calculations in the UI and/or backend (consistent and testable): available cash = sum(sales) − sum(expenses); daily profit = today sales − today expenses; monthly goal progress = (month net or month sales—use the definition shown in UI) / goal × 100, with safe handling when goal is 0 or missing.",
+      "reqIds": [
+        "REQ-5"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-apply-an-accessible-low-literacy-visual-design-system-tailored-to-guinea-market-traders-primary-blue-success-green-action-orange-large-buttons-large-icons-simple-typography-warm-modern-african-feel-consistent-spacing-and-contrast-across-all-screens",
+      "title": "Apply an accessible, low-literacy visual design system tailored to Guinea market traders: primary blue, success green, action orange; large buttons; large icons; simple typography; warm “modern African” feel; consistent spacing and contrast across all screens.",
+      "reqIds": [
+        "REQ-6"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-simple-performance-visualization-elements-for-monthly-progression-and-daily-performance-e-g-progress-bar-for-goal-and-a-compact-visual-summary-on-dashboard-summary-while-keeping-the-ui-extremely-simple",
+      "title": "Add simple performance visualization elements for monthly progression and daily performance (e.g., progress bar for goal and a compact visual summary on dashboard/summary) while keeping the UI extremely simple.",
+      "reqIds": [
+        "REQ-7"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-generated-static-assets-illustrations-icons-to-support-a-highly-visual-onboarding-and-category-selection-experience-and-render-them-in-the-relevant-screens-from-frontend-public-assets-generated-do-not-serve-images-from-the-backend",
+      "title": "Add generated static assets (illustrations + icons) to support a highly visual onboarding and category selection experience, and render them in the relevant screens from frontend/public/assets/generated (do not serve images from the backend).",
+      "reqIds": [
+        "REQ-8"
+      ],
+      "version": 1
+    }
+  ],
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Onboarding welcome screen with language selection (French + optional local language) and start flow",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-2",
+      "summary": "Profile creation: capture first name, activity type selection via icons, store user language",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-3",
+      "summary": "Dashboard: greet user, show today’s available cash (GNF), quick actions for adding sale/expense",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-4",
+      "summary": "Sales entry screen: amount (GNF) + optional product, save to backend",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-5",
+      "summary": "Expense entry screen: amount (GNF) + category via icons (Merchandise/Transport/Food/Other), save to backend",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-6",
+      "summary": "Daily summary screen: list today’s sales/expenses, auto-calc daily profit, show motivational message",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-7",
+      "summary": "Monthly goal feature: set goal per month, show progress bar and remaining amount, view goals",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-8",
+      "summary": "Offline mode with automatic synchronization when connectivity returns",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-9",
+      "summary": "Firebase backend schema: Users, Ventes, Depenses, Objectifs collections with specified fields",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-10",
+      "summary": "Automatic calculations: available cash = Σ sales − Σ expenses; daily profit; monthly progress percentage",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-11",
+      "summary": "Design system + accessibility: blue/green/orange palette, large buttons/icons, simple font, educational warm modern African style for low-literacy users",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-12",
+      "summary": "APK export and readiness for user testing/local deployment from FlutterFlow",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-13",
+      "summary": "Bonus: motivational notifications",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-14",
+      "summary": "Bonus (later): voice/audio guidance",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-15",
+      "summary": "Bonus: training/tutorial mode",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-16",
+      "summary": "Implement backend data model and APIs for a single-user-per-Principal cashbook: user profile, sales, expenses, and monthly goals, matching the provided collections/fields (Users: firstName, activityType, language; Sales: date, amount, product?; Expenses: date, amount, category; Goals: month, monthlyGoalAmount). Provide CRUD methods needed by the UI and computed-query methods needed for dashboard/summary/goal progress.",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "status": "pending"
+    }
+  ],
+  "gameProjectType": "none",
+  "projectName": "Gère Mon Argent",
+  "clarification_mode": "instant",
+  "clarification_rounds": 0
+}

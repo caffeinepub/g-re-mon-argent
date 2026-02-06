@@ -1,0 +1,289 @@
+{
+  "kind": "implementation_plan",
+  "version": "1.0",
+  "title": "Gère Mon Argent — mobile-first offline-first cashbook (frontend)",
+  "requirements": [
+    {
+      "id": "REQ-2",
+      "summary": "Build the 7 mobile-first screens and wire a simple, low-literacy navigation flow between them.",
+      "acceptanceCriteria": [
+        "All screens are reachable via clear navigation appropriate for low-literacy users (large tap targets, minimal text).",
+        "UI copy used in the app is in English (e.g., “Welcome! Manage your money easily”, “I sold”, “I spent”, “Validate”, etc.).",
+        "Dashboard shows “Hello, {firstName}” and displays “Today: {availableCash} GNF”.",
+        "Add Sale and Add Expense forms validate that amount is required and positive; successful submit returns to Dashboard or shows a success state.",
+        "Daily Summary shows today’s items and “Daily profit = today sales − today expenses”, plus a motivational message: “Well done! You earned {amount} GNF”.",
+        "Monthly Goal screen allows entering a monthly goal amount and shows progress percentage and remaining amount."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "create",
+          "description": "Create the app shell and implement a simple screen-based router (no extra top-level pages beyond the 7 required): Welcome, Profile Setup, Dashboard, Add Sale, Add Expense, Daily Summary, Monthly Goal. Wire navigation actions with large tap targets and minimal text for low-literacy usage."
+        },
+        {
+          "path": "frontend/src/screens/WelcomeScreen.tsx",
+          "operation": "create",
+          "description": "Implement Welcome screen with language selection + Start action; show the generated hero illustration (see REQ-8) and route to sign-in/profile flow when starting."
+        },
+        {
+          "path": "frontend/src/screens/ProfileSetupScreen.tsx",
+          "operation": "create",
+          "description": "Implement Profile Setup screen for first name + activity type selection using large icon tiles; save profile to backend when online and to offline queue when offline (see REQ-3)."
+        },
+        {
+          "path": "frontend/src/screens/DashboardScreen.tsx",
+          "operation": "create",
+          "description": "Implement Dashboard screen showing greeting (Hello, {firstName}) and Today available cash in GNF, plus two primary actions (“I sold”, “I spent”), and entry points to Daily Summary and Monthly Goal."
+        },
+        {
+          "path": "frontend/src/screens/AddSaleScreen.tsx",
+          "operation": "create",
+          "description": "Implement Add Sale form: amount (required, positive) + optional product; on submit, create sale online or queue offline, then return to Dashboard or show a minimal success state."
+        },
+        {
+          "path": "frontend/src/screens/AddExpenseScreen.tsx",
+          "operation": "create",
+          "description": "Implement Add Expense form: amount (required, positive) + category selection via large icon tiles; map the 4 requested categories to available backend enum values; on submit, create expense online or queue offline, then return to Dashboard or show a minimal success state."
+        },
+        {
+          "path": "frontend/src/screens/DailySummaryScreen.tsx",
+          "operation": "create",
+          "description": "Implement Daily Summary: list today’s sales and expenses, compute daily profit (today sales − today expenses), and show a motivational message “Well done! You earned {amount} GNF” (or a neutral variant when ≤ 0)."
+        },
+        {
+          "path": "frontend/src/screens/MonthlyGoalScreen.tsx",
+          "operation": "create",
+          "description": "Implement Monthly Goal: set goal amount, show progress bar, remaining amount, and optional lightweight history link placeholder (only if implemented within existing screens)."
+        },
+        {
+          "path": "frontend/src/components/PrimaryActionButton.tsx",
+          "operation": "create",
+          "description": "Create a reusable large primary action button component (Tailwind) to keep tap targets consistent across screens."
+        },
+        {
+          "path": "frontend/src/components/IconTile.tsx",
+          "operation": "create",
+          "description": "Create a reusable large icon + label tile component for activity type and expense category selection."
+        },
+        {
+          "path": "frontend/src/components/TopBar.tsx",
+          "operation": "create",
+          "description": "Create a simple mobile top bar for back navigation, screen title, and auth action (login/logout) where appropriate."
+        }
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "summary": "Implement offline-first writes by queueing sales/expenses/goals/profile changes locally and auto-syncing when back online, with UI indicators.",
+      "acceptanceCriteria": [
+        "When the app is offline, users can still add a sale/expense/goal and see it reflected immediately in UI totals/lists (optimistic local state).",
+        "Queued offline actions persist across page refresh (e.g., using IndexedDB/local storage) until successfully synced.",
+        "When the app returns online, queued actions are synced automatically and removed from the queue only after backend confirmation.",
+        "The UI indicates offline/online status and shows a small “Sync pending” indicator when queued actions exist."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/offline/offlineQueue.ts",
+          "operation": "create",
+          "description": "Implement a persistent offline action queue (prefer IndexedDB; fallback to localStorage) for createSale/createExpense/setMonthlyGoal/register/saveProfile actions, including stable client-generated ids for deduplication and safe retry."
+        },
+        {
+          "path": "frontend/src/offline/useOfflineSync.ts",
+          "operation": "create",
+          "description": "Implement a sync orchestrator hook that watches navigator.onLine + queued actions; replays queued actions sequentially against the backend actor, and removes items only after confirmation. Ensure retries do not create duplicates by guarding with client ids and local sync state."
+        },
+        {
+          "path": "frontend/src/offline/useConnectivityStatus.ts",
+          "operation": "create",
+          "description": "Provide a small hook that exposes online/offline state and listens to browser connectivity events."
+        },
+        {
+          "path": "frontend/src/components/SyncStatusChip.tsx",
+          "operation": "create",
+          "description": "Add a small UI indicator component that shows Offline/Online and a “Sync pending” badge when the queue is non-empty."
+        },
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Wire offline queue + sync hooks at the app-shell level; ensure optimistic local state overlays lists/totals and that screens re-render immediately after offline writes."
+        },
+        {
+          "path": "frontend/src/queries/cashbookQueries.ts",
+          "operation": "create",
+          "description": "Centralize React Query read queries (sales, expenses, available cash, goal) and provide helper functions to optimistically update cached data when offline actions are added."
+        }
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "summary": "Wire frontend to backend actor with Internet Identity sign-in, enforce profile setup before dashboard actions, and isolate data by authenticated user context.",
+      "acceptanceCriteria": [
+        "Unauthenticated users are prompted to sign in (Internet Identity) before accessing personal data.",
+        "After first sign-in, user is directed to Profile Setup if no profile exists.",
+        "After profile exists, user lands on Dashboard and sees their stored first name and activity type.",
+        "All create/list calls operate only on the authenticated user’s records (no cross-user access)."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/LoginButton.tsx",
+          "operation": "create",
+          "description": "Implement a Login/Logout button using the selected authorization component’s frontend guidance (Internet Identity + cache clearing). Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/hooks/useCurrentUserProfile.ts",
+          "operation": "create",
+          "description": "Create a React Query hook to fetch getCallerUserProfile with proper actor dependency/loading semantics per the selected authorization component guidance to avoid profile-setup flash. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Add auth gating: if not authenticated, show Welcome + sign-in prompt; after sign-in, load caller profile; if profile is null route to Profile Setup; else route to Dashboard. Ensure logout clears cached queries and local optimistic state."
+        },
+        {
+          "path": "frontend/src/queries/cashbookMutations.ts",
+          "operation": "create",
+          "description": "Centralize authenticated write mutations (createSale/createExpense/setMonthlyGoal/saveProfile/registerUser) and ensure they are only callable when identity is present; when offline, route writes to the offline queue and update optimistic cache."
+        }
+      ]
+    },
+    {
+      "id": "REQ-5",
+      "summary": "Implement consistent, testable money calculations and GNF formatting (available cash, daily profit, goal progress) with safe edge cases.",
+      "acceptanceCriteria": [
+        "Available cash and daily profit values match backend totals for the same period.",
+        "Monthly progress shows 0% when no goal is set; never divides by zero.",
+        "All monetary values are displayed with GNF suffix and use thousands separators for readability (e.g., 100,000 GNF)."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/utils/money.ts",
+          "operation": "create",
+          "description": "Add utilities for integer GNF handling: formatting with thousands separators + “GNF” suffix, parsing input safely to integer, and guarding against negative/NaN values."
+        },
+        {
+          "path": "frontend/src/utils/dates.ts",
+          "operation": "create",
+          "description": "Add utilities to compute ‘today’ and ‘current month’ boundaries and to filter sales/expenses lists by day/month using the backend Time values."
+        },
+        {
+          "path": "frontend/src/utils/calculations.ts",
+          "operation": "create",
+          "description": "Implement pure functions to compute: available cash (sales − expenses), daily profit, monthly net, and goal progress percent/remaining with safe handling for missing/0 goals (no division by zero)."
+        },
+        {
+          "path": "frontend/src/screens/DashboardScreen.tsx",
+          "operation": "modify",
+          "description": "Use money/date/calculation utilities to render Today available cash in GNF and ensure it matches the backend’s available cash definition used in the UI."
+        },
+        {
+          "path": "frontend/src/screens/DailySummaryScreen.tsx",
+          "operation": "modify",
+          "description": "Compute today totals and daily profit from the merged (server + optimistic offline) lists, and render the motivational message using formatted GNF."
+        },
+        {
+          "path": "frontend/src/screens/MonthlyGoalScreen.tsx",
+          "operation": "modify",
+          "description": "Compute and display progress percent and remaining amount safely (0% when no goal set), using formatted GNF."
+        }
+      ]
+    },
+    {
+      "id": "REQ-6",
+      "summary": "Apply an accessible, low-literacy mobile design system (Guinea market traders) with consistent colors, typography, spacing, and large tap targets.",
+      "acceptanceCriteria": [
+        "Primary actions (“I sold”, “I spent”, “Start”, “Validate”) are visually prominent and meet large tap-target sizing suitable for mobile.",
+        "Iconography is used for activity types and expense categories; text labels remain short and clear.",
+        "Color usage is consistent: blue for navigation/primary UI, green for positive states, orange for action/attention states.",
+        "Layouts are optimized for small screens first (no horizontal scrolling, readable font sizes)."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/index.css",
+          "operation": "create",
+          "description": "Define global Tailwind CSS variables/theme tokens (primary blue, success green, action orange) and base typography defaults optimized for mobile readability; keep styles minimal and consistent with the existing Tailwind setup."
+        },
+        {
+          "path": "frontend/tailwind.config.js",
+          "operation": "modify",
+          "description": "Extend Tailwind theme tokens (colors/radius/spacing) as needed to support the requested blue/green/orange system and consistent component sizing."
+        },
+        {
+          "path": "frontend/src/components/PrimaryActionButton.tsx",
+          "operation": "modify",
+          "description": "Ensure primary actions meet large tap target sizing (min height/spacing) and consistent color usage (blue primary, orange for key actions when needed, green for success confirmations)."
+        },
+        {
+          "path": "frontend/src/components/IconTile.tsx",
+          "operation": "modify",
+          "description": "Ensure icon tiles are large, high-contrast, and mobile-first; keep labels short and readable."
+        },
+        {
+          "path": "frontend/src/screens/WelcomeScreen.tsx",
+          "operation": "modify",
+          "description": "Apply the design system (spacing, typography, colors) and ensure the welcome experience is highly visual and low-text."
+        }
+      ]
+    },
+    {
+      "id": "REQ-7",
+      "summary": "Add minimal performance visualization (goal progress bar and compact daily profit cue) while keeping UI extremely simple.",
+      "acceptanceCriteria": [
+        "Monthly Goal screen includes a progress bar reflecting computed progress percent.",
+        "Dashboard or Daily Summary includes a clear, minimal visual cue (e.g., a small bar or chip) for today’s profit status (positive/negative/zero) without adding complex charts."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/ProgressBar.tsx",
+          "operation": "create",
+          "description": "Create a simple accessible progress bar component for monthly goal progress (0–100), using the design system colors."
+        },
+        {
+          "path": "frontend/src/screens/MonthlyGoalScreen.tsx",
+          "operation": "modify",
+          "description": "Render the ProgressBar with computed progress percent and show remaining amount in GNF; keep visuals minimal (no complex charts)."
+        },
+        {
+          "path": "frontend/src/components/ProfitStatusChip.tsx",
+          "operation": "create",
+          "description": "Create a compact visual cue for today’s profit status (positive/negative/zero) using color and a short label."
+        },
+        {
+          "path": "frontend/src/screens/DashboardScreen.tsx",
+          "operation": "modify",
+          "description": "Add the ProfitStatusChip (or similarly minimal cue) summarizing today’s profit status without adding charts."
+        }
+      ]
+    },
+    {
+      "id": "REQ-8",
+      "summary": "Wire the provided generated illustrations/icons from frontend/public/assets/generated into onboarding and category selection UI.",
+      "acceptanceCriteria": [
+        "Welcome screen displays the generated market/boutique illustration.",
+        "Profile activity type choices and expense categories use the generated icon set consistently.",
+        "All generated images are stored under frontend/public/assets/generated and referenced directly by the frontend."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/screens/WelcomeScreen.tsx",
+          "operation": "modify",
+          "description": "Render the welcome hero illustration from frontend/public/assets/generated/welcome-hero.dim_1400x900.png (static asset; do not serve from backend)."
+        },
+        {
+          "path": "frontend/src/screens/ProfileSetupScreen.tsx",
+          "operation": "modify",
+          "description": "Use the generated activity type icons in the activity selection tiles: frontend/public/assets/generated/icon-activity-shop.dim_256x256.png, frontend/public/assets/generated/icon-activity-food.dim_256x256.png, frontend/public/assets/generated/icon-activity-clothing.dim_256x256.png, frontend/public/assets/generated/icon-activity-transport.dim_256x256.png."
+        },
+        {
+          "path": "frontend/src/screens/AddExpenseScreen.tsx",
+          "operation": "modify",
+          "description": "Use the generated expense category icons in the category selection tiles: frontend/public/assets/generated/icon-expense-merchandise.dim_256x256.png, frontend/public/assets/generated/icon-expense-transport.dim_256x256.png, frontend/public/assets/generated/icon-expense-food.dim_256x256.png, frontend/public/assets/generated/icon-expense-other.dim_256x256.png."
+        },
+        {
+          "path": "frontend/src/components/IconTile.tsx",
+          "operation": "modify",
+          "description": "Ensure IconTile supports rendering provided static image assets consistently (size, spacing, alt text), and that icons remain large and easy to tap."
+        }
+      ]
+    }
+  ]
+}

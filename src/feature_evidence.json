@@ -1,0 +1,168 @@
+{
+  "kind": "feature_evidence_report",
+  "features": [
+    {
+      "featureId": "feature-create-a-mobile-first-frontend-with-the-7-requested-screens-and-navigation-flow-welcome-language-selection-start-profile-setup-first-name-activity-type-via-large-icons-dashboard-greeting-today-available-cash-in-gnf-two-primary-actions-add-sale-amount-optional-product-add-expense-amount-category-via-large-icons-daily-summary-today-s-sales-list-expenses-list-auto-daily-profit-motivational-message-monthly-goal-set-goal-progress-bar-remaining-amount-link-to-view-goals-history-if-implemented",
+      "featureTitle": "Create a mobile-first frontend with the 7 requested screens and navigation flow: Welcome (language selection + start), Profile Setup (first name + activity type via large icons), Dashboard (greeting + today available cash in GNF + two primary actions), Add Sale (amount + optional product), Add Expense (amount + category via large icons), Daily Summary (today’s sales list, expenses list, auto daily profit, motivational message), Monthly Goal (set goal, progress bar, remaining amount, link to view goals/history if implemented).",
+      "files": [
+        "frontend/src/App.tsx",
+        "frontend/src/components/IconTile.tsx",
+        "frontend/src/components/PrimaryActionButton.tsx",
+        "frontend/src/components/TopBar.tsx",
+        "frontend/src/screens/AddExpenseScreen.tsx",
+        "frontend/src/screens/AddSaleScreen.tsx",
+        "frontend/src/screens/DailySummaryScreen.tsx",
+        "frontend/src/screens/DashboardScreen.tsx",
+        "frontend/src/screens/MonthlyGoalScreen.tsx",
+        "frontend/src/screens/ProfileSetupScreen.tsx",
+        "frontend/src/screens/WelcomeScreen.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-2"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-implement-offline-first-data-entry-on-the-frontend-allow-creating-sales-expenses-goals-while-offline-by-queuing-writes-locally-and-automatically-sync-queued-actions-to-the-backend-when-connectivity-is-restored-without-data-loss-or-duplicate-entries",
+      "featureTitle": "Implement offline-first data entry on the frontend: allow creating sales/expenses/goals while offline by queuing writes locally, and automatically sync queued actions to the backend when connectivity is restored, without data loss or duplicate entries.",
+      "files": [
+        "frontend/src/App.tsx",
+        "frontend/src/components/SyncStatusChip.tsx",
+        "frontend/src/offline/offlineQueue.ts",
+        "frontend/src/offline/useConnectivityStatus.ts",
+        "frontend/src/offline/useOfflineSync.ts"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-3"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-wire-the-frontend-to-the-backend-using-the-project-s-standard-actor-auth-approach-internet-identity-ensuring-each-user-s-data-is-isolated-and-that-profile-creation-is-required-before-showing-the-main-dashboard-actions",
+      "featureTitle": "Wire the frontend to the backend using the project’s standard actor/auth approach (Internet Identity), ensuring each user’s data is isolated and that profile creation is required before showing the main dashboard actions.",
+      "files": [
+        "frontend/src/App.tsx",
+        "frontend/src/hooks/useCurrentUserProfile.ts"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-4"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-implement-the-automatic-calculations-in-the-ui-and-or-backend-consistent-and-testable-available-cash-sum-sales-sum-expenses-daily-profit-today-sales-today-expenses-monthly-goal-progress-month-net-or-month-sales-use-the-definition-shown-in-ui-goal-100-with-safe-handling-when-goal-is-0-or-missing",
+      "featureTitle": "Implement the automatic calculations in the UI and/or backend (consistent and testable): available cash = sum(sales) − sum(expenses); daily profit = today sales − today expenses; monthly goal progress = (month net or month sales—use the definition shown in UI) / goal × 100, with safe handling when goal is 0 or missing.",
+      "files": [
+        "frontend/src/screens/DailySummaryScreen.tsx",
+        "frontend/src/screens/DashboardScreen.tsx",
+        "frontend/src/screens/MonthlyGoalScreen.tsx",
+        "frontend/src/utils/calculations.ts",
+        "frontend/src/utils/dates.ts",
+        "frontend/src/utils/money.ts"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-5"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-apply-an-accessible-low-literacy-visual-design-system-tailored-to-guinea-market-traders-primary-blue-success-green-action-orange-large-buttons-large-icons-simple-typography-warm-modern-african-feel-consistent-spacing-and-contrast-across-all-screens",
+      "featureTitle": "Apply an accessible, low-literacy visual design system tailored to Guinea market traders: primary blue, success green, action orange; large buttons; large icons; simple typography; warm “modern African” feel; consistent spacing and contrast across all screens.",
+      "files": [
+        "frontend/src/components/IconTile.tsx",
+        "frontend/src/components/PrimaryActionButton.tsx",
+        "frontend/src/index.css",
+        "frontend/src/screens/WelcomeScreen.tsx",
+        "frontend/tailwind.config.js"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-6"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-add-simple-performance-visualization-elements-for-monthly-progression-and-daily-performance-e-g-progress-bar-for-goal-and-a-compact-visual-summary-on-dashboard-summary-while-keeping-the-ui-extremely-simple",
+      "featureTitle": "Add simple performance visualization elements for monthly progression and daily performance (e.g., progress bar for goal and a compact visual summary on dashboard/summary) while keeping the UI extremely simple.",
+      "files": [
+        "frontend/src/components/ProfitStatusChip.tsx",
+        "frontend/src/components/ProgressBar.tsx",
+        "frontend/src/screens/DashboardScreen.tsx",
+        "frontend/src/screens/MonthlyGoalScreen.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-7"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-add-generated-static-assets-illustrations-icons-to-support-a-highly-visual-onboarding-and-category-selection-experience-and-render-them-in-the-relevant-screens-from-frontend-public-assets-generated-do-not-serve-images-from-the-backend",
+      "featureTitle": "Add generated static assets (illustrations + icons) to support a highly visual onboarding and category selection experience, and render them in the relevant screens from frontend/public/assets/generated (do not serve images from the backend).",
+      "files": [
+        "frontend/src/components/IconTile.tsx",
+        "frontend/src/screens/AddExpenseScreen.tsx",
+        "frontend/src/screens/ProfileSetupScreen.tsx",
+        "frontend/src/screens/WelcomeScreen.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-8"
+      ],
+      "confidence": "high"
+    }
+  ]
+}

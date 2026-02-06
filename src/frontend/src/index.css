@@ -1,0 +1,105 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    :root {
+        --radius: 0.75rem;
+        
+        /* Primary: Warm Blue for navigation and primary UI */
+        --primary: 0.55 0.18 245;
+        --primary-foreground: 0.98 0 0;
+        
+        /* Success: Vibrant Green for positive states */
+        --success: 0.65 0.20 145;
+        
+        /* Warning: Warm Orange for action/attention states */
+        --warning: 0.68 0.22 45;
+        
+        /* Background and surfaces */
+        --background: 0.98 0 0;
+        --foreground: 0.15 0 0;
+        --card: 1 0 0;
+        --card-foreground: 0.15 0 0;
+        --popover: 1 0 0;
+        --popover-foreground: 0.15 0 0;
+        
+        /* Secondary and muted */
+        --secondary: 0.95 0 0;
+        --secondary-foreground: 0.20 0 0;
+        --muted: 0.96 0 0;
+        --muted-foreground: 0.50 0 0;
+        --accent: 0.96 0 0;
+        --accent-foreground: 0.20 0 0;
+        
+        /* Destructive */
+        --destructive: 0.58 0.24 25;
+        --destructive-foreground: 0.98 0 0;
+        
+        /* Borders and inputs */
+        --border: 0.90 0 0;
+        --input: 0.90 0 0;
+        --ring: 0.55 0.18 245;
+        
+        /* Charts */
+        --chart-1: 0.65 0.22 145;
+        --chart-2: 0.60 0.18 245;
+        --chart-3: 0.68 0.22 45;
+        --chart-4: 0.70 0.20 280;
+        --chart-5: 0.75 0.18 15;
+    }
+
+    .dark {
+        /* Primary: Lighter blue for dark mode */
+        --primary: 0.70 0.18 245;
+        --primary-foreground: 0.10 0 0;
+        
+        /* Success: Lighter green */
+        --success: 0.70 0.20 145;
+        
+        /* Warning: Lighter orange */
+        --warning: 0.75 0.22 45;
+        
+        /* Background and surfaces */
+        --background: 0.15 0 0;
+        --foreground: 0.95 0 0;
+        --card: 0.18 0 0;
+        --card-foreground: 0.95 0 0;
+        --popover: 0.20 0 0;
+        --popover-foreground: 0.95 0 0;
+        
+        /* Secondary and muted */
+        --secondary: 0.25 0 0;
+        --secondary-foreground: 0.95 0 0;
+        --muted: 0.25 0 0;
+        --muted-foreground: 0.65 0 0;
+        --accent: 0.30 0 0;
+        --accent-foreground: 0.95 0 0;
+        
+        /* Destructive */
+        --destructive: 0.65 0.24 25;
+        --destructive-foreground: 0.10 0 0;
+        
+        /* Borders and inputs */
+        --border: 0.30 0 0;
+        --input: 0.30 0 0;
+        --ring: 0.70 0.18 245;
+    }
+
+    * {
+        @apply border-border;
+    }
+    
+    body {
+        @apply bg-background text-foreground;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+    
+    /* Large tap targets for mobile */
+    button, a {
+        min-height: 44px;
+        min-width: 44px;
+    }
+}
