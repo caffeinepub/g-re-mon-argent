@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 3,
+  "projectStateVersion": 5,
   "summary": "Build an Android finance-tracking app for Guinea’s informal sector called “Gère Mon Argent” using FlutterFlow + Firebase, with a highly visual low-literacy UX, offline-first data entry with sync, sales/expense tracking, automatic calculations (available cash, daily profit, monthly progress), and monthly goals with performance visualization.",
   "architectural_notes": [
     "Tech stack target: FlutterFlow app with Firebase backend (Firestore) and Android APK export.",
@@ -8,11 +8,11 @@
     "Currency: GNF (Guinean Franc).",
     "Backend data model: Users(id, prenom, type_activite, langue), Ventes(id, user_id, date, montant, produit), Depenses(id, user_id, date, montant, categorie), Objectifs(id, user_id, mois, objectif_mensuel).",
     "Core formulas: available cash = Σ ventes − Σ depenses; daily profit = ventes_du_jour − depenses_du_jour; goal progress = (argent_cumule / objectif_mensuel) × 100.",
-    "Offline-first requirement with later synchronization."
+    "Offline-first requirement with later synchronization.",
+    "Provide an in-app sign-out flow (logout) so a user can disconnect and authenticate again to switch accounts; ensure user-isolated data access remains enforced after switching."
   ],
   "known_issues": [],
   "isFixRequest": false,
-  "imageRequirements": "## Required Images\n- Warm modern African market/boutique illustration, friendly and educational, vector style (welcome-hero.dim_1400x900.png)\n- Large simple icon for activity type: Shop/storefront, flat style (icon-activity-shop.dim_256x256.png)\n- Large simple icon for activity type: Food, flat style (icon-activity-food.dim_256x256.png)\n- Large simple icon for activity type: Clothing, flat style (icon-activity-clothing.dim_256x256.png)\n- Large simple icon for activity type: Transport, flat style (icon-activity-transport.dim_256x256.png)\n- Large simple icon for expense category: Merchandise/stock, flat style (icon-expense-merchandise.dim_256x256.png)\n- Large simple icon for expense category: Transport, flat style (icon-expense-transport.dim_256x256.png)\n- Large simple icon for expense category: Food, flat style (icon-expense-food.dim_256x256.png)\n- Large simple icon for expense category: Other/misc, flat style (icon-expense-other.dim_256x256.png)",
   "existing_features": [
     {
       "id": "feature-create-a-mobile-first-frontend-with-the-7-requested-screens-and-navigation-flow-welcome-language-selection-start-profile-setup-first-name-activity-type-via-large-icons-dashboard-greeting-today-available-cash-in-gnf-two-primary-actions-add-sale-amount-optional-product-add-expense-amount-category-via-large-icons-daily-summary-today-s-sales-list-expenses-list-auto-daily-profit-motivational-message-monthly-goal-set-goal-progress-bar-remaining-amount-link-to-view-goals-history-if-implemented",
@@ -67,6 +67,38 @@
       "title": "Add generated static assets (illustrations + icons) to support a highly visual onboarding and category selection experience, and render them in the relevant screens from frontend/public/assets/generated (do not serve images from the backend).",
       "reqIds": [
         "REQ-8"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-clear-user-visible-switch-account-logout-action-that-signs-the-user-out-of-internet-identity-and-returns-the-app-to-the-welcome-screen-so-the-user-can-log-in-with-a-different-account",
+      "title": "Add a clear, user-visible “Switch account” / logout action that signs the user out of Internet Identity and returns the app to the Welcome screen so the user can log in with a different account.",
+      "reqIds": [
+        "REQ-9"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-confirmation-dialog-before-logout-that-warns-the-user-they-are-about-to-sign-out-and-can-switch-accounts-if-there-are-pending-offline-actions-explicitly-warn-that-they-will-be-cleared-to-avoid-mixing-data-between-accounts",
+      "title": "Add a confirmation dialog before logout that warns the user they are about to sign out and can switch accounts; if there are pending offline actions, explicitly warn that they will be cleared to avoid mixing data between accounts.",
+      "reqIds": [
+        "REQ-10"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-ensure-switching-accounts-does-not-leak-or-mix-offline-first-queued-actions-or-optimistic-data-across-users-by-clearing-the-indexeddb-offline-queue-and-optimistic-store-as-part-of-the-logout-flow-along-with-clearing-react-query-cached-data",
+      "title": "Ensure switching accounts does not leak or mix offline-first queued actions or optimistic data across users by clearing the IndexedDB offline queue and optimistic store as part of the logout flow, along with clearing React Query cached data.",
+      "reqIds": [
+        "REQ-11"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-expose-the-logout-switch-account-action-consistently-wherever-a-topbar-is-shown-not-only-on-the-dashboard-so-the-user-can-switch-accounts-from-any-main-screen",
+      "title": "Expose the logout/switch-account action consistently wherever a TopBar is shown (not only on the Dashboard), so the user can switch accounts from any main screen.",
+      "reqIds": [
+        "REQ-12"
       ],
       "version": 1
     }
@@ -168,6 +200,12 @@
       "reqIds": [
         "REQ-1"
       ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-17",
+      "summary": "Add a logout / sign-out option in the app to allow switching accounts (change user)",
+      "reqIds": [],
       "status": "pending"
     }
   ],

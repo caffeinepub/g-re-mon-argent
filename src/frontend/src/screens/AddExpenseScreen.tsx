@@ -1,9 +1,12 @@
 import { useState } from 'react';
 import { useCreateExpense } from '../hooks/useQueries';
+import { useSwitchAccount } from '../hooks/useSwitchAccount';
+import { useOfflineQueue } from '../offline/offlineQueue';
 import { ExpenseCategory } from '../backend';
 import TopBar from '../components/TopBar';
 import PrimaryActionButton from '../components/PrimaryActionButton';
 import IconTile from '../components/IconTile';
+import SwitchAccountConfirmDialog from '../components/SwitchAccountConfirmDialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
@@ -25,7 +28,19 @@ const expenseCategories = [
 export default function AddExpenseScreen({ onNavigate }: AddExpenseScreenProps) {
   const [amount, setAmount] = useState('');
   const [category, setCategory] = useState<ExpenseCategory | ''>('');
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const { mutate: createExpense, isPending } = useCreateExpense();
+  const { switchAccount } = useSwitchAccount();
+  const { queueLength } = useOfflineQueue();
+
+  const handleSwitchAccountClick = () => {
+    setShowConfirmDialog(true);
+  };
+
+  const handleConfirmSwitch = async () => {
+    setShowConfirmDialog(false);
+    await switchAccount();
+  };
 
   const handleSubmit = () => {
     const parsedAmount = parseGNF(amount);
@@ -59,7 +74,11 @@ export default function AddExpenseScreen({ onNavigate }: AddExpenseScreenProps) 
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <TopBar title="Add Expense" onBack={() => onNavigate('dashboard')} />
+      <TopBar 
+        title="Add Expense" 
+        onBack={() => onNavigate('dashboard')}
+        onSwitchAccount={handleSwitchAccountClick}
+      />
 
       <main className="flex-1 px-6 py-8 max-w-2xl mx-auto w-full">
         <div className="space-y-6">
@@ -108,6 +127,13 @@ export default function AddExpenseScreen({ onNavigate }: AddExpenseScreenProps) 
           </div>
         </div>
       </main>
+
+      <SwitchAccountConfirmDialog
+        open={showConfirmDialog}
+        onOpenChange={setShowConfirmDialog}
+        onConfirm={handleConfirmSwitch}
+        hasPendingActions={queueLength > 0}
+      />
     </div>
   );
 }

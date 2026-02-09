@@ -31,7 +31,7 @@ export default function App() {
       setCurrentScreen('welcome');
     } else if (showProfileSetup) {
       setCurrentScreen('profile-setup');
-    } else if (showDashboard) {
+    } else if (showDashboard && currentScreen === 'welcome') {
       setCurrentScreen('dashboard');
     }
   }, [isAuthenticated, showProfileSetup, showDashboard]);

@@ -1,10 +1,12 @@
+import { useState } from 'react';
 import { useCurrentUserProfile } from '../hooks/useCurrentUserProfile';
 import { useAvailableCash, useTodayStats } from '../hooks/useQueries';
-import { useInternetIdentity } from '../hooks/useInternetIdentity';
-import { useQueryClient } from '@tanstack/react-query';
+import { useSwitchAccount } from '../hooks/useSwitchAccount';
+import { useOfflineQueue } from '../offline/offlineQueue';
 import PrimaryActionButton from '../components/PrimaryActionButton';
 import TopBar from '../components/TopBar';
 import ProfitStatusChip from '../components/ProfitStatusChip';
+import SwitchAccountConfirmDialog from '../components/SwitchAccountConfirmDialog';
 import { formatGNF } from '../utils/money';
 import { ShoppingBag, TrendingDown, Calendar, Target } from 'lucide-react';
 
@@ -18,19 +20,24 @@ export default function DashboardScreen({ onNavigate }: DashboardScreenProps) {
   const { userProfile } = useCurrentUserProfile();
   const { data: availableCash, isLoading: cashLoading } = useAvailableCash();
   const { data: todayStats } = useTodayStats();
-  const { clear } = useInternetIdentity();
-  const queryClient = useQueryClient();
+  const { switchAccount } = useSwitchAccount();
+  const { queueLength } = useOfflineQueue();
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 
-  const handleLogout = async () => {
-    await clear();
-    queryClient.clear();
+  const handleSwitchAccountClick = () => {
+    setShowConfirmDialog(true);
+  };
+
+  const handleConfirmSwitch = async () => {
+    setShowConfirmDialog(false);
+    await switchAccount();
   };
 
   const todayProfit = todayStats ? todayStats.salesTotal - todayStats.expensesTotal : 0;
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <TopBar title="Dashboard" onLogout={handleLogout} />
+      <TopBar title="Dashboard" onSwitchAccount={handleSwitchAccountClick} />
 
       <main className="flex-1 px-6 py-6 space-y-6 max-w-2xl mx-auto w-full">
         {/* Greeting */}
@@ -94,6 +101,13 @@ export default function DashboardScreen({ onNavigate }: DashboardScreenProps) {
           </button>
         </div>
       </main>
+
+      <SwitchAccountConfirmDialog
+        open={showConfirmDialog}
+        onOpenChange={setShowConfirmDialog}
+        onConfirm={handleConfirmSwitch}
+        hasPendingActions={queueLength > 0}
+      />
     </div>
   );
 }

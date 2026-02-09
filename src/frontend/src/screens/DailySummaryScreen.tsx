@@ -1,5 +1,9 @@
+import { useState } from 'react';
 import { useSales, useExpenses, useTodayStats } from '../hooks/useQueries';
+import { useSwitchAccount } from '../hooks/useSwitchAccount';
+import { useOfflineQueue } from '../offline/offlineQueue';
 import TopBar from '../components/TopBar';
+import SwitchAccountConfirmDialog from '../components/SwitchAccountConfirmDialog';
 import { formatGNF } from '../utils/money';
 import { isToday } from '../utils/dates';
 import { TrendingUp, TrendingDown } from 'lucide-react';
@@ -14,6 +18,18 @@ export default function DailySummaryScreen({ onNavigate }: DailySummaryScreenPro
   const { data: sales = [] } = useSales();
   const { data: expenses = [] } = useExpenses();
   const { data: todayStats } = useTodayStats();
+  const { switchAccount } = useSwitchAccount();
+  const { queueLength } = useOfflineQueue();
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+
+  const handleSwitchAccountClick = () => {
+    setShowConfirmDialog(true);
+  };
+
+  const handleConfirmSwitch = async () => {
+    setShowConfirmDialog(false);
+    await switchAccount();
+  };
 
   const todaySales = sales.filter(sale => isToday(sale.date));
   const todayExpenses = expenses.filter(expense => isToday(expense.date));
@@ -30,7 +46,11 @@ export default function DailySummaryScreen({ onNavigate }: DailySummaryScreenPro
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <TopBar title="Daily Summary" onBack={() => onNavigate('dashboard')} />
+      <TopBar 
+        title="Daily Summary" 
+        onBack={() => onNavigate('dashboard')}
+        onSwitchAccount={handleSwitchAccountClick}
+      />
 
       <main className="flex-1 px-6 py-6 space-y-6 max-w-2xl mx-auto w-full">
         {/* Profit Card */}
@@ -114,6 +134,13 @@ export default function DailySummaryScreen({ onNavigate }: DailySummaryScreenPro
           )}
         </div>
       </main>
+
+      <SwitchAccountConfirmDialog
+        open={showConfirmDialog}
+        onOpenChange={setShowConfirmDialog}
+        onConfirm={handleConfirmSwitch}
+        hasPendingActions={queueLength > 0}
+      />
     </div>
   );
 }

@@ -134,6 +134,22 @@ export async function clearOptimisticData() {
   });
 }
 
+export async function clearAllOfflineData() {
+  const database = await getDB();
+  
+  return new Promise<void>((resolve, reject) => {
+    const transaction = database.transaction([QUEUE_STORE, OPTIMISTIC_STORE], 'readwrite');
+    const queueStore = transaction.objectStore(QUEUE_STORE);
+    const optimisticStore = transaction.objectStore(OPTIMISTIC_STORE);
+    
+    queueStore.clear();
+    optimisticStore.clear();
+    
+    transaction.oncomplete = () => resolve();
+    transaction.onerror = () => reject(transaction.error);
+  });
+}
+
 export function mergeOptimisticData<T extends Sale | Expense>(type: 'sales' | 'expenses', serverData: T[]): T[] {
   // In a real implementation, we'd fetch from IndexedDB
   // For now, just return server data

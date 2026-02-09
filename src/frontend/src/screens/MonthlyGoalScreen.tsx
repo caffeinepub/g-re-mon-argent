@@ -1,8 +1,11 @@
 import { useState } from 'react';
 import { useSetMonthlyGoal, useMonthlyGoalProgress, useAvailableCash } from '../hooks/useQueries';
+import { useSwitchAccount } from '../hooks/useSwitchAccount';
+import { useOfflineQueue } from '../offline/offlineQueue';
 import TopBar from '../components/TopBar';
 import PrimaryActionButton from '../components/PrimaryActionButton';
 import ProgressBar from '../components/ProgressBar';
+import SwitchAccountConfirmDialog from '../components/SwitchAccountConfirmDialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { formatGNF, parseGNF } from '../utils/money';
@@ -17,12 +20,24 @@ interface MonthlyGoalScreenProps {
 
 export default function MonthlyGoalScreen({ onNavigate }: MonthlyGoalScreenProps) {
   const [goalAmount, setGoalAmount] = useState('');
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const currentMonth = getCurrentMonth();
   const currentYear = getCurrentYear();
   
   const { data: availableCash = 0 } = useAvailableCash();
   const { data: progressPercent = 0 } = useMonthlyGoalProgress(currentYear, currentMonth);
   const { mutate: setGoal, isPending } = useSetMonthlyGoal();
+  const { switchAccount } = useSwitchAccount();
+  const { queueLength } = useOfflineQueue();
+
+  const handleSwitchAccountClick = () => {
+    setShowConfirmDialog(true);
+  };
+
+  const handleConfirmSwitch = async () => {
+    setShowConfirmDialog(false);
+    await switchAccount();
+  };
 
   const handleSetGoal = () => {
     const parsedAmount = parseGNF(goalAmount);
@@ -52,7 +67,11 @@ export default function MonthlyGoalScreen({ onNavigate }: MonthlyGoalScreenProps
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <TopBar title="Monthly Goal" onBack={() => onNavigate('dashboard')} />
+      <TopBar 
+        title="Monthly Goal" 
+        onBack={() => onNavigate('dashboard')}
+        onSwitchAccount={handleSwitchAccountClick}
+      />
 
       <main className="flex-1 px-6 py-8 max-w-2xl mx-auto w-full">
         <div className="space-y-8">
@@ -110,6 +129,13 @@ export default function MonthlyGoalScreen({ onNavigate }: MonthlyGoalScreenProps
           </div>
         </div>
       </main>
+
+      <SwitchAccountConfirmDialog
+        open={showConfirmDialog}
+        onOpenChange={setShowConfirmDialog}
+        onConfirm={handleConfirmSwitch}
+        hasPendingActions={queueLength > 0}
+      />
     </div>
   );
 }

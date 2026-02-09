@@ -1,198 +1,97 @@
 {
   "kind": "build_request",
-  "title": "Build “Gère Mon Argent” mobile-first cashbook app (Guinea, GNF) with offline-first entry + sync",
+  "title": "Enhance logout to support switching Internet Identity accounts",
   "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-1",
-      "text": "Implement backend data model and APIs for a single-user-per-Principal cashbook: user profile, sales, expenses, and monthly goals, matching the provided collections/fields (Users: firstName, activityType, language; Sales: date, amount, product?; Expenses: date, amount, category; Goals: month, monthlyGoalAmount). Provide CRUD methods needed by the UI and computed-query methods needed for dashboard/summary/goal progress.",
-      "target": "backend",
-      "source": {
-        "messageIds": [
-          "msg-2"
-        ],
-        "quotes": [
-          "🧱 STRUCTURE DES DONNÉES (FIREBASE / BACKEND)\nCollection : Users ... Collection : Ventes ... Collection : Depenses ... Collection : Objectifs ...",
-          "⚙️ LOGIQUE AUTOMATIQUE À IMPLÉMENTER\nFormules :\n• Argent disponible = Σ ventes – Σ dépenses\n• Bénéfice journalier = ventes du jour – dépenses du jour\n• Progression objectif = (argent cumulé / objectif mensuel) × 100"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Backend stores user profile keyed by caller Principal and can be created/updated/read.",
-        "Backend supports creating/listing sales and expenses for the caller, including filtering by day and by month.",
-        "Backend supports setting/getting a monthly goal for a given month for the caller.",
-        "Backend exposes a query to return: availableCash (all-time or current month—align with UI definition), todaySalesTotal, todayExpensesTotal, todayProfit, monthSalesTotal, monthExpensesTotal, goalProgressPercent, goalRemainingAmount.",
-        "All amounts are stored as integers in GNF (no floating point); API docs/comments clarify this."
-      ]
-    },
-    {
-      "id": "REQ-2",
-      "text": "Create a mobile-first frontend with the 7 requested screens and navigation flow: Welcome (language selection + start), Profile Setup (first name + activity type via large icons), Dashboard (greeting + today available cash in GNF + two primary actions), Add Sale (amount + optional product), Add Expense (amount + category via large icons), Daily Summary (today’s sales list, expenses list, auto daily profit, motivational message), Monthly Goal (set goal, progress bar, remaining amount, link to view goals/history if implemented).",
+      "id": "REQ-9",
+      "text": "Add a clear, user-visible “Switch account” / logout action that signs the user out of Internet Identity and returns the app to the Welcome screen so the user can log in with a different account.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-2"
+          "msg-4"
         ],
         "quotes": [
-          "🖥️ ÉCRANS À GÉNÉRER\n🟦 Écran 1 : Bienvenue ... 🟦 Écran 7 : Objectif mensuel ..."
+          "AUGMENTE L'OPTION DE DECONEXION POUR CHANGER DE COMPTE"
         ]
       },
       "acceptanceCriteria": [
-        "All screens are reachable via clear navigation appropriate for low-literacy users (large tap targets, minimal text).",
-        "UI copy used in the app is in English (e.g., “Welcome! Manage your money easily”, “I sold”, “I spent”, “Validate”, etc.).",
-        "Dashboard shows “Hello, {firstName}” and displays “Today: {availableCash} GNF”.",
-        "Add Sale and Add Expense forms validate that amount is required and positive; successful submit returns to Dashboard or shows a success state.",
-        "Daily Summary shows today’s items and “Daily profit = today sales − today expenses”, plus a motivational message: “Well done! You earned {amount} GNF”.",
-        "Monthly Goal screen allows entering a monthly goal amount and shows progress percentage and remaining amount."
+        "From the Dashboard, the user can explicitly trigger a sign-out action intended for switching accounts.",
+        "After signing out, the app shows the Welcome screen and the user can log in again with a different Internet Identity.",
+        "No authenticated screens (Dashboard/Add Sale/Add Expense/Daily Summary/Monthly Goal/Profile Setup) remain accessible after logout unless the user logs in again."
       ]
     },
     {
-      "id": "REQ-3",
-      "text": "Implement offline-first data entry on the frontend: allow creating sales/expenses/goals while offline by queuing writes locally, and automatically sync queued actions to the backend when connectivity is restored, without data loss or duplicate entries.",
+      "id": "REQ-10",
+      "text": "Add a confirmation dialog before logout that warns the user they are about to sign out and can switch accounts; if there are pending offline actions, explicitly warn that they will be cleared to avoid mixing data between accounts.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-2"
+          "msg-4"
         ],
         "quotes": [
-          "• Fonctionnement hors ligne + synchronisation",
-          "🧠 OPTIONS BONUS À PRÉVOIR\n• Mode hors ligne\n• Synchronisation automatique"
+          "AUGMENTE L'OPTION DE DECONEXION POUR CHANGER DE COMPTE"
         ]
       },
       "acceptanceCriteria": [
-        "When the app is offline, users can still add a sale/expense/goal and see it reflected immediately in UI totals/lists (optimistic local state).",
-        "Queued offline actions persist across page refresh (e.g., using IndexedDB/local storage) until successfully synced.",
-        "When the app returns online, queued actions are synced automatically and removed from the queue only after backend confirmation.",
-        "The UI indicates offline/online status and shows a small “Sync pending” indicator when queued actions exist."
+        "Tapping the logout/switch-account action opens a confirmation dialog with English copy.",
+        "If there are pending offline actions, the dialog indicates pending actions exist and that proceeding will clear them.",
+        "Cancel keeps the user signed in and returns to the current screen; Confirm completes logout."
       ]
     },
     {
-      "id": "REQ-4",
-      "text": "Wire the frontend to the backend using the project’s standard actor/auth approach (Internet Identity), ensuring each user’s data is isolated and that profile creation is required before showing the main dashboard actions.",
-      "target": "both",
-      "source": {
-        "messageIds": [
-          "msg-2"
-        ],
-        "quotes": [
-          "Collection : Users\n• id\n• prenom\n• type_activite\n• langue"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Unauthenticated users are prompted to sign in (Internet Identity) before accessing personal data.",
-        "After first sign-in, user is directed to Profile Setup if no profile exists.",
-        "After profile exists, user lands on Dashboard and sees their stored first name and activity type.",
-        "All create/list calls operate only on the authenticated user’s records (no cross-user access)."
-      ]
-    },
-    {
-      "id": "REQ-5",
-      "text": "Implement the automatic calculations in the UI and/or backend (consistent and testable): available cash = sum(sales) − sum(expenses); daily profit = today sales − today expenses; monthly goal progress = (month net or month sales—use the definition shown in UI) / goal × 100, with safe handling when goal is 0 or missing.",
-      "target": "both",
-      "source": {
-        "messageIds": [
-          "msg-2"
-        ],
-        "quotes": [
-          "⚙️ LOGIQUE AUTOMATIQUE À IMPLÉMENTER\nFormules :\n• Argent disponible = Σ ventes – Σ dépenses\n• Bénéfice journalier = ventes du jour – dépenses du jour\n• Progression objectif = (argent cumulé / objectif mensuel) × 100"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Available cash and daily profit values match backend totals for the same period.",
-        "Monthly progress shows 0% when no goal is set; never divides by zero.",
-        "All monetary values are displayed with GNF suffix and use thousands separators for readability (e.g., 100,000 GNF)."
-      ]
-    },
-    {
-      "id": "REQ-6",
-      "text": "Apply an accessible, low-literacy visual design system tailored to Guinea market traders: primary blue, success green, action orange; large buttons; large icons; simple typography; warm “modern African” feel; consistent spacing and contrast across all screens.",
+      "id": "REQ-11",
+      "text": "Ensure switching accounts does not leak or mix offline-first queued actions or optimistic data across users by clearing the IndexedDB offline queue and optimistic store as part of the logout flow, along with clearing React Query cached data.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-2"
+          "msg-4"
         ],
         "quotes": [
-          "🎨 DESIGN SYSTEM\n• Couleurs :\n o Bleu (primary)\n o Vert (success)\n o Orange (action)\n• Boutons larges\n• Icônes grandes\n• Police simple\n• UX pour personnes peu alphabétisées\n• Style éducatif, chaleureux, africain moderne"
+          "AUGMENTE L'OPTION DE DECONEXION POUR CHANGER DE COMPTE"
         ]
       },
       "acceptanceCriteria": [
-        "Primary actions (“I sold”, “I spent”, “Start”, “Validate”) are visually prominent and meet large tap-target sizing suitable for mobile.",
-        "Iconography is used for activity types and expense categories; text labels remain short and clear.",
-        "Color usage is consistent: blue for navigation/primary UI, green for positive states, orange for action/attention states.",
-        "Layouts are optimized for small screens first (no horizontal scrolling, readable font sizes)."
+        "After logout, the offline action queue is empty (no pending actions remain).",
+        "After logout, any optimistic/offline locally stored sales/expenses are cleared and do not appear for the next logged-in account.",
+        "After logout, React Query cache is cleared so the next account does not briefly display the previous account’s cached values."
       ]
     },
     {
-      "id": "REQ-7",
-      "text": "Add simple performance visualization elements for monthly progression and daily performance (e.g., progress bar for goal and a compact visual summary on dashboard/summary) while keeping the UI extremely simple.",
+      "id": "REQ-12",
+      "text": "Expose the logout/switch-account action consistently wherever a TopBar is shown (not only on the Dashboard), so the user can switch accounts from any main screen.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-2"
+          "msg-4"
         ],
         "quotes": [
-          "• Visualiser les performances",
-          "🟦 Écran 7 : Objectif mensuel\n• Barre de progression"
+          "AUGMENTE L'OPTION DE DECONEXION POUR CHANGER DE COMPTE"
         ]
       },
       "acceptanceCriteria": [
-        "Monthly Goal screen includes a progress bar reflecting computed progress percent.",
-        "Dashboard or Daily Summary includes a clear, minimal visual cue (e.g., a small bar or chip) for today’s profit status (positive/negative/zero) without adding complex charts."
-      ]
-    },
-    {
-      "id": "REQ-8",
-      "text": "Add generated static assets (illustrations + icons) to support a highly visual onboarding and category selection experience, and render them in the relevant screens from frontend/public/assets/generated (do not serve images from the backend).",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-2"
-        ],
-        "quotes": [
-          "🟦 Écran 1 : Bienvenue\n• Illustration : marché africain / boutique",
-          "Choix type d’activité (icônes) ...",
-          "Catégories avec icônes ..."
-        ]
-      },
-      "acceptanceCriteria": [
-        "Welcome screen displays the generated market/boutique illustration.",
-        "Profile activity type choices and expense categories use the generated icon set consistently.",
-        "All generated images are stored under frontend/public/assets/generated and referenced directly by the frontend."
+        "Add Sale, Add Expense, Daily Summary, and Monthly Goal screens provide access to the same logout/switch-account action (e.g., via TopBar action).",
+        "Logout behavior is consistent across all screens (confirmation + sign out + reset to Welcome)."
       ]
     }
   ],
   "constraints": [
-    "Use the existing React + TypeScript + Tailwind + React Query frontend stack; do not introduce FlutterFlow.",
-    "Use a single Motoko actor for all backend logic (backend/main.mo).",
-    "Do not edit files under frontend/src/components/ui or other immutablePaths; compose them instead.",
-    "No Firebase integration; persist data on the Internet Computer backend and implement offline queueing locally in the browser.",
-    "No third-party auth providers; use Internet Identity only."
+    "Do not modify files under frontend/src/hooks/useInternetIdentity.ts or any other frontend immutablePaths; consume the existing `clear()` method from the Internet Identity hook instead.",
+    "Backend remains single-actor; no backend changes are required for logout/switch-account behavior."
   ],
   "nonGoals": [
-    "Android APK export (deliver as a mobile-friendly web app running in the browser).",
-    "Push notifications and background scheduled notifications.",
-    "Voice/audio guidance (explicitly marked as later by the user).",
-    "Real-time features (websockets/live updates)."
+    "Adding multiple profiles under one Internet Identity principal.",
+    "Adding third-party authentication providers beyond Internet Identity.",
+    "Implementing account management UI beyond sign out / switch account."
   ],
   "imageRequirements": {
-    "required": [
-      "Warm modern African market/boutique illustration, friendly and educational, vector style (welcome-hero.dim_1400x900.png)",
-      "Large simple icon for activity type: Shop/storefront, flat style (icon-activity-shop.dim_256x256.png)",
-      "Large simple icon for activity type: Food, flat style (icon-activity-food.dim_256x256.png)",
-      "Large simple icon for activity type: Clothing, flat style (icon-activity-clothing.dim_256x256.png)",
-      "Large simple icon for activity type: Transport, flat style (icon-activity-transport.dim_256x256.png)",
-      "Large simple icon for expense category: Merchandise/stock, flat style (icon-expense-merchandise.dim_256x256.png)",
-      "Large simple icon for expense category: Transport, flat style (icon-expense-transport.dim_256x256.png)",
-      "Large simple icon for expense category: Food, flat style (icon-expense-food.dim_256x256.png)",
-      "Large simple icon for expense category: Other/misc, flat style (icon-expense-other.dim_256x256.png)"
-    ],
+    "required": [],
     "edits": []
   },
   "userProfileUpdate": {
     "goalsToAdd": [],
     "goalsToRemove": [],
-    "preferencesToAdd": [
-      "Mobile-first, highly visual UX for low-literacy users in Guinea; currency GNF; French/local language selection concept."
-    ],
+    "preferencesToAdd": [],
     "preferencesToRemove": [],
     "miscToAdd": [],
     "miscToRemove": [],

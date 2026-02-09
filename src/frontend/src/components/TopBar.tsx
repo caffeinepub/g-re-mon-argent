@@ -4,10 +4,10 @@ import { Button } from '@/components/ui/button';
 interface TopBarProps {
   title: string;
   onBack?: () => void;
-  onLogout?: () => void;
+  onSwitchAccount?: () => void;
 }
 
-export default function TopBar({ title, onBack, onLogout }: TopBarProps) {
+export default function TopBar({ title, onBack, onSwitchAccount }: TopBarProps) {
   return (
     <header className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border">
       <div className="flex items-center justify-between px-4 py-4 max-w-2xl mx-auto">
@@ -25,14 +25,15 @@ export default function TopBar({ title, onBack, onLogout }: TopBarProps) {
           <h1 className="text-xl font-bold text-foreground">{title}</h1>
         </div>
         
-        {onLogout && (
+        {onSwitchAccount && (
           <Button
             variant="ghost"
-            size="icon"
-            onClick={onLogout}
-            className="h-10 w-10"
+            size="sm"
+            onClick={onSwitchAccount}
+            className="h-10 gap-2"
           >
-            <LogOut className="h-5 w-5" />
+            <LogOut className="h-4 w-4" />
+            <span className="hidden sm:inline">Switch Account</span>
           </Button>
         )}
       </div>

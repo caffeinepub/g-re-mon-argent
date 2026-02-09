@@ -1,92 +1,33 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-06T16:05:37.866Z",
-  "summary": "Diff adds a Motoko backend actor and a React/TS mobile-first frontend with multiple screens, Internet Identity wiring, offline queueing/sync (IndexedDB), and UI components (large buttons, icon tiles, sync chip, progress/profit chips). However, several key spec constraints appear violated or mismatched, especially around money types (Float vs integer GNF) and enumerations/categories.",
-  "missing_requirements": [
-    {
-      "id": "REQ-1",
-      "requirement": "All amounts are stored as integers in GNF (no floating point); API docs/comments clarify this.",
-      "reason": "Backend data model defines `amount` and `monthlyGoalAmount` as `Float`, and `createSale` takes `amount : Float`, which conflicts with the integer-only requirement.",
-      "evidence": [
-        "backend/main.mo"
-      ]
-    },
-    {
-      "id": "REQ-1",
-      "requirement": "Match the provided collections/fields and domain values (Sales amount int GNF; Expenses category; Goals monthlyGoalAmount int GNF; language as specified by UI).",
-      "reason": "Backend defines `ExpenseCategory` values (#marketing, #product, #travel, #subscriptions, #other) that do not align with required expense categories (Merchandise/stock, Transport, Food, Other). Backend also defines `Language` as {#en; #de; #fr}, while the request only calls for language selection in UI (no German specified).",
-      "evidence": [
-        "backend/main.mo"
-      ]
-    },
-    {
-      "id": "REQ-2",
-      "requirement": "Daily Summary motivational message uses the specified copy: “Well done! You earned {amount} GNF”.",
-      "reason": "DailySummaryScreen builds a message that appends an emoji and uses alternative strings for zero/negative profit; the positive case is `Well done! You earned ${formatGNF(profit)} 💪` rather than the specified text (and includes an emoji).",
-      "evidence": [
-        "frontend/src/screens/DailySummaryScreen.tsx"
-      ]
-    }
-  ],
+  "generatedAt": "2026-02-06T16:47:11.996Z",
+  "summary": "Implemented a Switch Account/logout flow via a new confirmation dialog and a useSwitchAccount hook that clears offline IndexedDB data, clears React Query cache, and calls the existing Internet Identity hook clear(); added a Switch Account action in TopBar and wired it into Dashboard, Add Sale, Add Expense, Daily Summary, and Monthly Goal screens. App resets to Welcome when unauthenticated.",
+  "missing_requirements": [],
   "hallucinated_features": [
     {
-      "description": "Admin/secret-token based access-control initialization on the frontend actor setup.",
-      "reason": "Spec requires Internet Identity only and does not request an admin token URL parameter or secret-based access-control initialization; the diff adds `_initializeAccessControlWithSecret` using a `caffeineAdminToken` URL parameter.",
+      "description": "Added/modified IndexedDB implementation details and introduced an `idb` dependency (package.json) beyond the explicit logout/switch-account requirements.",
+      "reason": "BuildRequest focuses on using existing Internet Identity `clear()` and clearing offline queue/optimistic store + React Query cache; it does not request adding a new IndexedDB library dependency or broader offline storage refactors.",
       "evidence": [
-        "frontend/src/hooks/useActor.ts"
-      ]
-    },
-    {
-      "description": "Backend authorization mixin/access-control system with role/permission checks and admin bypass logic.",
-      "reason": "Spec requests per-Principal isolation and Internet Identity auth, but does not request a custom AccessControl/MixinAuthorization framework, admin roles, or permission-gated registration/profile access.",
-      "evidence": [
-        "backend/main.mo"
-      ]
-    },
-    {
-      "description": "German language option in backend Language enum.",
-      "reason": "BuildRequest only calls for language selection on Welcome and English UI copy; it does not request German support.",
-      "evidence": [
-        "backend/main.mo"
+        "frontend/package.json",
+        "frontend/src/offline/offlineQueue.ts",
+        "frontend-file-summaries.txt"
       ]
     }
   ],
-  "confidence": 0.72,
+  "confidence": 0.74,
   "changed_files": [
-    "all_files_summary.json",
-    "backend/main.mo",
     "frontend-file-summaries.txt",
-    "frontend/index.css",
-    "frontend/index.html",
     "frontend/src/App.tsx",
-    "frontend/src/components/IconTile.tsx",
-    "frontend/src/components/PrimaryActionButton.tsx",
-    "frontend/src/components/ProfitStatusChip.tsx",
-    "frontend/src/components/ProgressBar.tsx",
-    "frontend/src/components/SyncStatusChip.tsx",
+    "frontend/src/components/SwitchAccountConfirmDialog.tsx",
     "frontend/src/components/TopBar.tsx",
-    "frontend/src/hooks/useActor.ts",
-    "frontend/src/hooks/useCurrentUserProfile.ts",
-    "frontend/src/hooks/useInternetIdentity.ts",
-    "frontend/src/hooks/useQueries.ts",
-    "frontend/src/index.css",
-    "frontend/src/main.tsx",
+    "frontend/src/hooks/useSwitchAccount.ts",
     "frontend/src/offline/offlineQueue.ts",
-    "frontend/src/offline/useConnectivityStatus.ts",
-    "frontend/src/offline/useOfflineSync.ts",
     "frontend/src/screens/AddExpenseScreen.tsx",
     "frontend/src/screens/AddSaleScreen.tsx",
     "frontend/src/screens/DailySummaryScreen.tsx",
     "frontend/src/screens/DashboardScreen.tsx",
     "frontend/src/screens/MonthlyGoalScreen.tsx",
-    "frontend/src/screens/ProfileSetupScreen.tsx",
-    "frontend/src/screens/WelcomeScreen.tsx",
-    "frontend/src/utils/calculations.ts",
-    "frontend/src/utils/dates.ts",
-    "frontend/src/utils/money.ts",
-    "frontend/src/utils/urlParams.ts",
-    "frontend/tailwind.config.js",
     "project_state.json"
   ]
 }
